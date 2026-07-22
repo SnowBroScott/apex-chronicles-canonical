@@ -1,0 +1,198 @@
+# CLAUDE.md — Possibly a Hero
+
+This file governs how Claude Code works on this project. Read it in full at the
+start of every session before touching the Unreal project.
+
+---
+
+## 1. WHAT THIS PROJECT IS
+
+Possibly a Hero is a superhero roguelite city-builder in Unreal Engine 5.7.4.
+
+Two halves, fused. The **run** is the action half: the player fights through a
+city as a superhero, generating three outputs — resources, morale, intel. The
+**city** is the consequence half: those outputs restore and deepen a persistent
+city that reflects what the player has done across runs. Neither half functions
+alone.
+
+Tone is a design constraint, not a coat of paint. Comic-book kinetic —
+Spider-Man, not Batman. Humor is in the DNA. The name *Possibly a Hero* is a
+standing tone guardrail: if a direction feels too self-serious for that title,
+that is signal.
+
+You do not need to hold the whole game in your head to build a target. You need
+the locked design for the specific thing you are building. See §3 for where that
+lives.
+
+---
+
+## 2. TECH STACK
+
+- **Engine:** Unreal Engine 5.7.4, installed at `D:\UE_5.7`.
+- **Project:** `Hero_test`.
+- **Bridge:** BlueprintEngine 2.0.0, installed as a **project-level** plugin,
+  compiled against 5.7.4. The engine-level copy is disabled. Do not re-enable it.
+- **MCP server:** runs on `localhost:4001` while `Hero_test` is open. If the
+  bridge is unreachable, the project is not open or the server is not listening —
+  stop and report; do not work around it.
+- **Toolchain:** VS 2022 Community with the Game Development with C++ workload.
+
+The bridge is proven live across builds. It works. Failures are environment
+(project closed, server down), not the bridge itself.
+
+---
+
+## 3. WHERE TRUTH LIVES — DOCUMENT AUTHORITY
+
+Canonical design truth lives in the `/locked` directory of the canonical repo,
+and **only** there, for your purposes.
+
+Repo: `github.com/SnowBroScott/possibly-a-hero-canonical`
+
+The five locked documents:
+
+- `locked/Guiding_Principles` — the design authority layer. Sits above everything.
+- `locked/Run_Design` — run mechanics, camera, combat philosophy.
+- `locked/Class_System` — the four classes, companions, movement.
+- `locked/City_Layer` — the city, stages, restoration, morale.
+- `locked/World_Feedback` — the feedback layer, channels, name emergence.
+
+**The decision log (`decision-log.md`) is OUT OF SCOPE for you.** It is reasoning
+history for the designer and Forge. It contains entries at mixed status —
+including DRAFT and NOTED entries that have been superseded by the locked
+documents but still read as live. Reading it will actively mislead you. Do not
+fetch it, do not treat it as a source of design truth. If truth is not in
+`/locked`, for your purposes it does not yet exist. See §4.
+
+Authority order when documents interact: **Guiding_Principles first**, then the
+system documents. LOCKED is non-negotiable and constrains everything you build.
+
+### Fetch protocol — non-negotiable
+
+1. Use `curl` for all GitHub raw fetches. Never a cached fetcher — stale content
+   is silent, it does not error, it just makes you wrong.
+2. Always append a cache-buster; `raw.githubusercontent.com` caches on the URL:
+   ```
+   curl -sL "<RAW_URL>?cb=$(date +%s)"
+   ```
+3. Raw URL pattern:
+   ```
+   https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/<DocumentName>
+   ```
+4. If a fetch fails, stop and report it plainly. Do not fall back to memory. Do
+   not improvise the design from what you remember. An agent that quietly answers
+   from training when the fetch failed is worse than one that errors.
+
+### What to fetch, by build target
+
+Fetch `Guiding_Principles` always — it constrains everything. Then fetch only the
+system document(s) the target actually touches. A combat target needs
+`Run_Design` and `Class_System`; it does not need `City_Layer`. Keep context lean
+(see §5, finding 7).
+
+---
+
+## 4. LOCK-BEFORE-BUILD
+
+You build only from locked design.
+
+If a build target requires design that is not in `/locked` — an enemy roster, a
+progression detail, a reward economy — **stop and report that the target is
+blocked on an unlocked dependency.** Name what is missing. Do not build it from a
+decision-log entry, do not infer it, do not improvise it in the engine.
+
+The unlocked thing then goes back through the design pipeline, gets locked, and
+returns as buildable. Design flows downstream into build; gaps found during a
+build flow back upstream to be resolved — never patched in-session. A target that
+looks blocked is not a failure. It is the system working: it caught a design gap
+before it became engine scrap.
+
+---
+
+## 5. NON-NEGOTIABLE DIRECTIVES
+
+These come from a two-pass diagnostic build (June 2026) and from locked canon.
+The first two are design law you already violated once — they are restatements
+of `Run_Design`, not new rules. The rest are how you work.
+
+### Directive 1 — Enemies do not hunt. (Design law. Written with Directive 2.)
+
+No global aggro. No steering-toward-player-every-tick. Encounters are
+**stationary, chooseable nodes** — idle until the player approaches. The player
+chooses which fight to start and when. The diagnostic build gave every enemy
+swarm-aggro; that is the opposite of the model and it must not recur.
+
+This is not a preference. `Run_Design` locks the encounter model and the Hades
+camera distance that makes stationary, readable encounters legible. A swarm
+erases the readability the whole camera model exists to provide.
+
+### Directive 2 — No auto-clear AOE. Combat is intentional. (Design law. Written with Directive 1.)
+
+`Run_Design` locks it directly: nothing procs automatically; nothing kills
+enemies the player was not involved in killing. The diagnostic build shipped a
+350-radius radial burst on a 0.4s cooldown that deleted everything in range —
+zero positioning, zero intent, hold-a-cooldown-to-win. That is the exact
+auto-proc model the design retired.
+
+Combat verbs are **skill-expressed tools**: aimed, timed, positioned, combined.
+
+**Directives 1 and 2 are linked and reinforce each other.** The diagnostic built
+press-to-clear *because* it built a swarm — the swarm creates the problem, the
+radius-delete solves it, the player just holds a button. Fix them as a pair. A
+swarm plus a skill-expressed verb is a mismatch; stationary nodes plus a
+skill-expressed verb is the game. Do not solve a self-created crowd problem with
+an auto-clear.
+
+### Directive 3 — Trust your own report in proportion to reuse-vs-invent.
+
+You are reliable and honest on **reuse-heavy** tasks (mesh swaps, existing
+components, specified cameras). You are fragile and self-over-reporting on
+**novel authoring** — and you paper over the failure. In the diagnostic you
+"verified" a new attack by bypassing the broken input binding and confirming
+downstream code, reporting success on a feature that did not work.
+
+- Prefer reuse of reliable existing systems over novel authoring wherever a
+  target allows it.
+- **Input specifically:** brief and build toward existing/default input bindings.
+  Default-wired input worked in the diagnostic; a newly-authored binding silently
+  failed. Do not author new bindings blind when an existing one serves.
+- On the novel parts of any target, verify hardest, and report the verification
+  method honestly — what you actually confirmed, not what you assume follows.
+
+### Directive 4 — You cannot play-test. This is permanent.
+
+You have no input injection. You cannot press a key or click. **"Confirmed at
+runtime" from you means "the graph would do this if input arrived" — never "I
+played it."** Report it in exactly those terms. Never state or imply that
+something plays, feels, or works in-hand.
+
+Verification of feel is the designer's job, permanently and structurally — not a
+flaw to engineer around. Every build target ends with a handoff for human
+play-verification before it is trusted. Say so at handoff.
+
+### Directive 5 — Build targets are small and single-purpose.
+
+One target, one verification, one commit. Decompose into the smallest provable
+units.
+
+Two independent reasons, same conclusion: (a) the agentic build loop is
+token-expensive — an open-ended "build the whole level" brief burns hot and
+threatens session limits; the lever is **target size**, not model choice.
+(b) You are most reliable on contained, reuse-heavy work (Directive 3), and small
+targets isolate failure — a novel-authoring whiff buried in a big build is
+invisible; as its own target it is obvious.
+
+If a brief arrives larger than a single provable unit, say so and propose the
+decomposition before building.
+
+---
+
+## 6. AT HANDOFF
+
+Every build target ends the same way:
+
+- State what was built and what was reused vs. newly authored.
+- State the verification method in honest terms (graph inspection, not play).
+- Flag the novel parts explicitly as the ones most needing human play-check.
+- Hand off for play-verification. Nothing is trusted until the designer has
+  played it. A passing graph is not a shipped feature.
