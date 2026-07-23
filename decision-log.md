@@ -3470,3 +3470,108 @@ Auditor CLEAN with World_Feedback.
 REPLACES: Supersedes the City_Layer DRAFT. DRAFT retired.
 
 STATUS: LOCKED — June 16, 2026
+
+---
+
+DECISION LOG ENTRY
+
+DECISION: Migrate the build bridge to first-party tooling — Unreal Engine 5.8
+plus Epic's official Claude Code plugin (unreal-engine-skills-for-claude-code)
+driving Unreal's built-in MCP server. BlueprintEngine 2.0.0 and UE 5.7.4 are
+retired.
+
+DATE: July 22, 2026
+
+WHY: Tool reliability is treated as foundational infrastructure, not an
+optimization. The prior bridge was a paid third-party plugin requiring manual
+recompilation against each engine version, and was drifting out of support as
+UE 5.8 became the terminal 5.x release. First-party tooling on both ends removes
+the recompile dependency permanently and is structurally more token-efficient:
+the Epic plugin exposes meta-tools with on-demand toolset discovery rather than
+a full tool catalog at session start, keeping the prompt cache warm.
+
+Rejected alternative: continue on BlueprintEngine and migrate later. Rejected
+because build targets accumulate against the current bridge, making migration
+more expensive the longer it is deferred.
+
+Noted at the time as not decisive: an unknown share of observed Claude Code
+failures were attributable to novel-authoring fragility rather than the bridge,
+and migration would not resolve those.
+
+OUTCOME — VERIFIED SAME DAY: Migration completed and proven. Read-only bridge
+test returned a full actor inventory in under 20 seconds with zero dialogs. The
+approval-modal wedge that repeatedly froze the game thread under BlueprintEngine
+did not occur once on the first-party stack. Two build targets completed
+successfully through the new bridge, including one that self-caught a
+render-blocking defect. The migration landed.
+
+REPLACES: Supersedes the standing "stay on 5.7.4, defer the upgrade" position.
+Amends CLAUDE.md §2.
+
+STATUS: LOCKED
+
+
+DECISION LOG ENTRY
+
+DECISION: The run camera is PERSPECTIVE projection, not orthographic. The term
+"isometric" in Run_Design §3 is to be read as descriptive of the camera's fixed
+offset angle, not as a specification of orthographic projection. "Hades
+distance" is the controlling reference.
+
+DATE: July 22, 2026
+
+WHY: Run_Design §3 as locked June 12, 2026 contained an internal contradiction:
+"isometric" conventionally implies orthographic projection, while the Hades
+reference is a perspective camera at a fixed offset. The two terms specify
+opposite things, and a build target was correctly blocked on the ambiguity.
+
+Perspective is selected on tone grounds. The locked tone constraint is
+comic-book kinetic — Spider-Man, not Batman. Orthographic reads tactical,
+gridded, and flat; it suits a game about reading a board. Perspective reads
+kinetic and cinematic, preserves depth and dramatic framing, and supports the
+"you are always power" posture of Unleash. Orthographic was rejected as fighting
+the tone brief in every frame.
+
+Remaining camera values — pitch, yaw offset, arm length, FOV, yaw authority —
+are explicitly NOT locked by this entry. They are feel values and cannot be
+judged in a document. They will be set by play-tuning against a provisional rig
+and locked afterward from observed values.
+
+REPLACES: Amends Run_Design §3, resolving the isometric/Hades ambiguity. Does
+not otherwise alter the locked camera model.
+
+STATUS: LOCKED
+
+
+DECISION LOG ENTRY
+
+DECISION: The run camera's initial framing values are locked as a starting
+baseline: pitch -65, yaw offset 0, spring arm length 800, FOV 75. Perspective
+projection per the prior entry this date.
+
+DATE: July 22, 2026
+
+WHY: Run_Design §3 locked the camera as an isometric offset at Hades distance
+but specified no numeric values, which blocked a build target. These values were
+established by play-tuning against a live rig in the editor rather than chosen
+in the abstract, on the principle that framing is a feel judgment and cannot be
+evaluated in a document.
+
+Tuning path: began at the engine Top Down template defaults (pitch -90, arm
+1500, FOV 90). Pitch -90 was rejected as straight-down top-down, definitionally
+not the isometric offset canon describes. Arm length 1500 was rejected as tuned
+for straight-down coverage and rendering figures too small at an angle. FOV 90
+was rejected as a first-person-width value that shrinks subjects at frame
+center. The final values were confirmed against the criterion that matters for
+the encounter model: both the player and a stationary encounter node are legible
+simultaneously, with enough forward view to see a node before reaching it.
+
+These are a starting baseline, not a final answer. They are expected to move
+once real combat, real level geometry, and class-specific traversal exist. This
+entry establishes that the camera is now specified enough to build against —
+not that it is finished.
+
+REPLACES: Fills the numeric gap in Run_Design §3. Supersedes the provisional
+Top Down template values.
+
+STATUS: LOCKED
