@@ -1,17 +1,19 @@
 # Possibly a Hero — Canonical Manifest
 
-Routing table for the canonical repo. Read first, every session, every
-agent. This file states what documents exist, whether they are
-authoritative, and where to fetch them. It does not state what they
-contain — for that, fetch the document.
+Routing table for the canonical repo — the directory of what documents
+exist, whether they are authoritative, and where to fetch them. Consulted
+when you need to locate or verify a document. This is NOT the session-open
+read: for current state and what's next, read status.md. This file does
+not state what documents contain — for that, fetch the document.
 
 ---
 
 ## How to use
 
-- Fetch this manifest before any work. Then fetch the documents the work
-  requires.
+- For orientation at session open, read status.md. Consult this manifest
+  when you need to locate or verify a specific document.
 - Authority order: LOCKED > DRAFT. Deprecated documents have none.
+  status.md is not authority — it reflects state, it does not set it.
 - The manifest routes; it does not summarize. Never work from a Note in
   this file — fetch the document and read the source. A summary kept
   apart from its source drifts; this file refuses to hold one.
@@ -52,11 +54,21 @@ contain — for that, fetch the document.
 Notes state relationships and fetch timing only — how a document relates
 to others, when to read it. Never contents.
 
+### status.md — ACTIVE
+https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/status.md
+The session-open read. Current state — what's built, what's blocked,
+what's next. Overwritten every session; git holds history. Holds nothing
+permanent: it reflects state and stages findings headed for permanent
+homes. Points at /locked (constraints), decision-log.md (why), and
+CLAUDE.md (build law). Reflects state; never sets it.
+
 ### decision-log.md — CANONICAL SOURCE
 https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/decision-log.md
-Permanent record of all decisions. Entries append to the bottom; newest
-is last. Verify the final entry against known state. Mixed status — read
-each entry per its own STATUS line.
+Permanent record of all decisions — the why, including roads not taken.
+Grepped for the entry you need, on demand. Never read whole; never the
+session-open read — currency lives in status.md. Entries append to the
+bottom; newest is last. Mixed status — read each entry per its own
+STATUS line.
 
 ### CLAUDE.md — ACTIVE
 https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/CLAUDE.md
@@ -99,8 +111,9 @@ Supporting material. Not subject to pipeline validation.
 
 ## Repo structure
 
+/status.md          — session-open read: current state, what's next
 /CLAUDE.md          — build brief, read by Claude Code at session start
-/canonical-manifest — this routing table
-/decision-log.md    — permanent record of all decisions
+/canonical-manifest — this routing table (directory of documents)
+/decision-log.md    — permanent record of all decisions (the why)
 /locked             — canonical, non-negotiable documents
 /DRAFT              — draft documents in refinement (empty)
