@@ -89,8 +89,34 @@ helped build, and is now fighting through.
 
 Camera scope:
 - Third-person perspective: intro sequence only
-- Isometric offset: all run gameplay
+- Fixed-offset angled camera: all run gameplay
 - Third-person asset investment is bounded by the intro sequence scope
+
+Projection and framing:
+
+The run camera uses PERSPECTIVE projection, not orthographic. Where this
+document uses the word "isometric," it describes the camera's fixed offset
+angle only — it does not specify orthographic projection. Hades distance is
+the controlling reference. Orthographic was rejected on tone grounds: it
+reads tactical, gridded, and flat, which fights the comic-book kinetic brief
+in every frame.
+
+Baseline framing values:
+- Pitch: -65
+- Yaw offset: 0
+- Spring arm length: 800
+- Field of view: 75
+
+These were established by play-tuning against a live rig, not chosen in the
+abstract. The criterion they satisfy: the player and a stationary encounter
+node are legible simultaneously, with enough forward view to see a node
+before reaching it.
+
+They are a starting baseline, not a final answer, and are expected to move
+once real combat, real level geometry, and class-specific traversal exist.
+Camera yaw authority — whether and how the player can rotate the camera — is
+NOT specified by this document. It is a feel value and will be set by
+play-tuning.
 
 Reference hierarchy:
 - Run camera and combat feel: Hades
