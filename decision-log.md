@@ -3575,3 +3575,201 @@ REPLACES: Fills the numeric gap in Run_Design §3. Supersedes the provisional
 Top Down template values.
 
 STATUS: LOCKED
+
+---
+
+DECISION LOG ENTRY
+
+DECISION: The run camera's baseline pitch is -40, superseding -65.
+
+DATE: July 23, 2026
+
+WHY: -65 was established on July 22 by play-tuning against a stationary
+encounter node on an empty plane, and it satisfied the legibility criterion it
+was set against. Walking the same plane with three nodes revealed the value it
+failed: -65 shows plenty of ground and almost no distance, which reads as
+claustrophobic — a box, regardless of how large the box actually is. At -40 the
+frame gains a horizon, the same empty plane reads as a place the hero is
+standing in rather than something being hovered over, and multiple encounter
+nodes hold in frame simultaneously. That last property is the one the encounter
+model depends on: the player cannot choose between things they cannot see at
+once.
+
+-40 also serves the original forward-view criterion better than -65 did, and it
+is a move toward the locked comic-book kinetic tone and away from the flat
+tactical read that orthographic projection was rejected for on July 22.
+
+The cost is named and accepted: a flatter camera sees more of the world's upper
+volume, and occludes harder on anything between camera and character. Both are
+consequences that only geometry can reveal, and the value was established on a
+featureless plane.
+
+This is a starting baseline, not a final answer — the same status -65 carried.
+Spring arm length 800 was tuned at -65 and has NOT been re-tuned since; it is a
+known-stale coupled value.
+
+REPLACES: Supersedes the pitch value in the July 22, 2026 camera baseline entry
+and in Run_Design §3. All other values from that entry stand.
+
+STATUS: LOCKED
+
+
+DECISION LOG ENTRY
+
+DECISION: The player has camera yaw authority. Camera pitch is never
+player-controlled.
+
+DATE: July 23, 2026
+
+WHY: Run_Design §3 explicitly left yaw authority unspecified as a feel value.
+The case for freeing it is a topology argument, not a preference: a fixed camera
+is a contract with level design, and Hades can honor that contract because it
+builds small contained rooms to the camera. A city cannot. With a street grid
+and a fixed yaw, running north is a categorically different experience from
+running east, and alleys either always read or never do. Yaw solves occlusion
+and orientation in a world that is too large and too irregular to frame from one
+angle.
+
+Pitch is withheld deliberately, and the distinction is load-bearing: yaw solves
+an information problem, pitch controls horizon and therefore tone. Handing the
+player a pitch dial hands them the ability to tune the game's tone flat, and
+players reliably settle a free camera into the flattest, most informative angle
+available. The correct response to a visibility concern is to lower the locked
+pitch — which was done this date — not to make pitch a control.
+
+Rejected alternative: keep the camera fully fixed and build the city to it in
+the Hades manner. Rejected as incompatible with the scale of the run
+environment.
+
+REPLACES: Fills the yaw-authority gap explicitly left open by Run_Design §3 and
+by the July 22, 2026 camera entry.
+
+STATUS: LOCKED
+
+
+DECISION LOG ENTRY
+
+DECISION: Character movement is camera-relative. The camera is the aiming frame.
+
+DATE: July 23, 2026
+
+WHY: Both schemes were built and walked. Absolute movement — WASD mapped to
+fixed world axes, camera rotating independently — was the initial specification,
+on the reasoning that a peek down a side street should not become a turn, and
+that a consistent screen-direction contract is easier to hold. Camera-relative
+movement was then wired and felt directly, and was preferred.
+
+The deciding argument is not traversal, it is targeting. The game has
+directional powers; Run_Design §4 commits to powers that are aimed, timed and
+positioned through active decision. If the camera is the reference the player
+aims along, then a movement basis that cannot rotate is a targeting basis that
+cannot rotate. The character turning to face where the camera looks is not a
+side effect of the movement model — it is the aiming model. Combat is the real
+consumer of this decision, not traversal.
+
+The accepted cost: holding a movement input while looking off-axis produces a
+turn rather than a peek. The player drifts off their line. This was felt and
+accepted.
+
+Noted as NOT verified: the aiming-frame rationale was reasoned and felt on an
+empty plane with no directional power in existence. The first combat verb is
+what confirms or kills it.
+
+Implication carried forward, not decided here: if the camera is the aiming
+frame, yaw likely wants to be continuously available rather than gated behind a
+held button, since a player cannot aim with a control they must remember to hold
+mid-fight.
+
+REPLACES: Supersedes the "WASD stays absolute" position taken earlier the same
+date.
+
+STATUS: LOCKED
+
+
+DECISION LOG ENTRY
+
+DECISION: Camera yaw on a held right-mouse gate, snapping back to a fixed
+default on release, is DECLINED.
+
+DATE: July 23, 2026
+
+WHY: The design was specified and then superseded within the same session. It
+was built for a peek — lean out, look down the alley, release, return to a known
+orientation — which is coherent only if the camera is a viewing tool. Once the
+camera became the aiming frame, there is nothing to snap back to: the camera's
+orientation IS the player's facing, and returning it automatically would fight
+the player mid-engagement. A held gate also fails the combat test directly — an
+aiming control that must be held is a control the player will not hold when it
+matters.
+
+Recorded so it is not reproposed. The underlying instinct — that the player
+wants a way to look without committing — may still be real, but it needs a
+different mechanism than a yaw gate.
+
+REPLACES: Nothing — supersedes an intra-session proposal that was never locked.
+
+STATUS: DECLINED
+
+
+DECISION LOG ENTRY
+
+DECISION: The city is built to the camera. Camera legibility is a constraint on
+level design, not an outcome of it.
+
+DATE: July 23, 2026
+
+WHY: Every street, alley, block and mission spawn is checkable against a single
+question — does this read at the run camera — and geometry that fails gets
+rebuilt. This is the same contract Hades holds, applied to a larger and less
+contained environment.
+
+The reasoning is scope, not fidelity. An angled camera looking downward at
+street level defines what does NOT need to exist: the upper skyline, weather
+systems, high-rise interiors, the sky as a rendered space. What is needed is the
+lower storeys of buildings, the street surface, and the occasional glimpse of
+open air where the city meets a harbor or a gap. The camera is not a cost
+imposed on level design — for a solo developer it is the budget, because it is
+what makes "we are not building that" a defensible answer rather than a
+compromise. The city stays contained and boxed in by construction.
+
+Consequence accepted: freeing camera yaw means facades can no longer be cheated.
+With a fixed camera the back of a block is never seen and need not exist; with
+rotation, every side eventually faces the player. This is bounded additional
+work — the same two storeys, more of them — and does not threaten containment.
+
+Consequence flagged, not resolved: the pitch value spends this budget directly.
+Every degree of pitch lowered buys kinetic tone and costs vertical world that
+must be built and lit. Pitch is therefore a single control governing both feel
+and scope, and cannot be tuned on feel alone.
+
+REPLACES: Nothing — new decision.
+
+STATUS: LOCKED
+
+
+DECISION LOG ENTRY
+
+DECISION: Camera yaw is applied to the spring arm's relative rotation, never to
+controller rotation.
+
+DATE: July 23, 2026
+
+WHY: A build finding, verified directly in the engine. The pawn's movement
+function derives its forward and right vectors from a rotator built out of a
+yaw *value* — not from control rotation and not from the camera component's
+world transform. Consequently, driving yaw through `Add Controller Yaw Input`
+changes nothing visible while silently accumulating control rotation state, and
+driving it on the spring arm is what the movement basis actually reads.
+
+Recorded because this is the kind of arrangement a later pass will "correct" to
+the engine-conventional approach and break both the camera and the movement
+basis in one edit.
+
+Noted honestly: this was established on a scratch test rig, not on production
+pawn architecture. It describes how the current pawn behaves, and constrains any
+reimplementation to preserve the same relationship — it does not prescribe the
+final implementation.
+
+REPLACES: Nothing — new build finding.
+
+STATUS: NOTED
