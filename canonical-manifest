@@ -1,182 +1,106 @@
 # Possibly a Hero — Canonical Manifest
 
-*Single source of truth for all pipeline documents*
-
-Last updated: June 16, 2026
-
----
-
-## How to Use This Manifest
-
-Every agent fetches this manifest before doing any work.
-
-1. Locate the document needed and confirm its status.
-
-2. Fetch the document using the raw URL listed below.
-
-3. Confirm the fetch before beginning any work.
-
-4. Locked documents take authority over drafts.
-
-5. Deprecated documents have no canonical authority.
-
-6. If a fetch fails, stop and report it. Do not fall back to memory.
+Routing table for the canonical repo. Read first, every session, every
+agent. This file states what documents exist, whether they are
+authoritative, and where to fetch them. It does not state what they
+contain — for that, fetch the document.
 
 ---
 
-## Fetch Protocol Note
+## How to use
 
-All document URLs in this manifest use raw GitHub URLs. Fetch each
-document directly using the raw URL listed below.
-
-GitHub CDN caching is inconsistent regardless of URL format — both
-raw and blob URLs can serve stale content. After fetching any
-document, verify it is current by checking the last entry or section
-against known project state. This applies to this manifest itself —
-verify the Last updated date against known project state before
-trusting document statuses. If any content appears out of date,
-do not proceed. Request a manual paste from the designer instead.
-Manual paste is authoritative. Never fall back to memory.
-
-Use bash_tool with curl for all GitHub raw URL fetches —
-web_fetch serves stale CDN content regardless of URL format.
-curl is the reliable path.
+- Fetch this manifest before any work. Then fetch the documents the work
+  requires.
+- Authority order: LOCKED > DRAFT. Deprecated documents have none.
+- The manifest routes; it does not summarize. Never work from a Note in
+  this file — fetch the document and read the source. A summary kept
+  apart from its source drifts; this file refuses to hold one.
+- No "last updated" date, by design. Git owns history; a hand-typed date
+  is a liar. Run `git log` if you need it.
 
 ---
 
-## Document Status Hierarchy
+## Fetch protocol — non-negotiable
 
-- **LOCKED** — Non-negotiable. Constrains everything below it.
-- **DRAFT** — Directionally committed. Still refinable.
-- **NOTED** — Worth capturing. Not yet a formal decision.
-- **CANONICAL SOURCE** — Origin document for pipeline decisions. Entry-level authority applies — treat each entry according to its own stated status.
-- **DEPRECATED** — Superseded. Historical reference only.
-- **REFERENCE** — Supporting material. Not subject to pipeline.
-
----
-
-## Active Documents
-
-### decision-log.md
-
-- **Status:** CANONICAL SOURCE — contains entries of mixed status.
-  LOCKED entries within are non-negotiable. Document grows
-  continuously as decisions are recorded.
-- **Raw URL:** https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/decision-log.md
-- **Notes:** Primary record of all design decisions. Every agent
-  fetches this document directly. Do not rely on summaries or
-  static uploads as substitutes for a live fetch. Entries append
-  to the bottom — newest entries are always at the end of the file.
-  Verify currency by confirming the final entry matches known
-  project state. If stale, request manual paste.
+- Use bash_tool + curl with a cache-buster:
+  `curl -sL "<RAW_URL>?cb=$(date +%s)"`. Never web_fetch — it caches
+  silently and makes you wrong without erroring.
+- Verify currency: check the fetched tail or final entry against known
+  project state before trusting it.
+- Stale despite the cache-buster → stop, request a manual paste. Manual
+  paste is authoritative.
+- Fetch fails → stop and report plainly. Do not work around it. Never
+  fall back to memory.
 
 ---
 
-## Locked Documents
+## Status vocabulary
 
-### Guiding_Principles
-
-- **Status:** LOCKED — June 14, 2026
-- **Raw URL:** https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/Guiding_Principles
-- **Notes:** Design authority layer. Sits above all system documents
-  in the pipeline. Six operative principles: Consequence without
-  punishment, Mirrors not gates, Mastery is real and expressible,
-  Identity emerges through play, Power Unleashed, The name as tone
-  guardrail. Enforced through Forge's disposition. Validation order:
-  content is checked against Guiding Principles BEFORE other system
-  documents. Principle conflicts surface through Forge in design
-  conversations.
-
-### Run_Design
-
-- **Status:** LOCKED — June 12, 2026
-- **Raw URL:** https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/Run_Design
-- **Notes:** Canonical specification for run mechanics — three-act
-  structure as information states, hard twenty-minute run wall,
-  mission spawn at Act Two reveal, hard commitment gate, completion
-  tiers (minimum / exceptional / perfect) with stacking outputs,
-  continuous build development, banked mission permanence, camera
-  and combat model, minor objectives, Hero Points, run resolution.
-  Incorporates all May 9 and June 12 locked decisions. Canon Guard
-  PASS June 12, 2026. First locked document in the pipeline.
-  Constrains all draft documents.
-
-### Class_System
-
-- **Status:** LOCKED — June 15, 2026
-- **Raw URL:** https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/Class_System
-- **Notes:** Canonical specification for class mechanics — four classes
-  on the speed-to-durability pendulum (Speedster → Blaster → Tactician →
-  Brawler), class-locked movement, three-layer power architecture
-  (class primary / hero powers / support), seven-power hero pool, the
-  Companion System (Giggles ranged DPS, Rose melee DPS, S.G.T. evasive
-  tank, Doug support — one role each, advanced mechanics deferred-
-  pending-core-loop), Tactician momentum/toggle movement system,
-  Character Authorship model, mastery progression, mentor system.
-  Canon Guard PASS June 15, 2026. Cross-System Auditor TENSIONS FOUND
-  (all MINOR, all resolved as decision-log housekeeping). Consistent
-  with locked Run Design, Guiding Principles, the Brawler direction
-  lock, and the Tactician toggle lock. Constrains City_Layer and
-  World_Feedback.
-
-### City_Layer
-
-- **Status:** LOCKED — June 16, 2026
-- **Raw URL:** https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/City_Layer
-- **Notes:** Canonical specification for city mechanics — mirrors not
-  gates (scoped to the post-tutorial city; the tutorial arc gates by
-  run type as onboarding only), tutorial arc buildings, four city
-  stages, Training Center complete system (two independent parallel
-  deepening tracks: Hero Points tiered upgrades and mentor challenges,
-  no cross-payment), Hero's Lair, restoration model, city-wide morale
-  (parallel city-state system; no run-side mechanical effect),
-  run-to-city flow with completion tiers and stacking mission outputs.
-  Reconciled with locked Run Design, Guiding Principles, and minor
-  objectives. Canon Guard PASS June 16, 2026. Cross-System Auditor
-  CLEAN (with World_Feedback) June 16, 2026.
-
-### World_Feedback
-
-- **Status:** LOCKED — June 16, 2026
-- **Raw URL:** https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/World_Feedback
-- **Notes:** Canonical specification for world feedback — the feedback
-  layer as a single hidden scale read through three channel voices
-  (Citizens, Superhero Community, Rex Flynn) that agree on the event
-  and disagree on its meaning; the scale reflects, never grades, gates,
-  or punishes (mirrors not gates on the narrative layer). Name emergence
-  as a three-branch behavioral engine (showed up / didn't show /
-  abandoned), read from behavior not from the scale or morale. Absence
-  is voiced, never penalized. Morale is a parallel city-state system
-  with no run-side effect. Rex Flynn character specification, minor
-  objectives as world signal. Reconciled with locked Run Design,
-  Guiding Principles, and minor objectives. Canon Guard PASS June 16,
-  2026. Cross-System Auditor CLEAN (with City_Layer) June 16, 2026.
+- LOCKED — non-negotiable; constrains everything below it.
+- DRAFT — directionally committed; still refinable.
+- NOTED — captured; not yet a formal decision.
+- CANONICAL SOURCE — origin record of mixed-status entries; each entry
+  governed by its own status.
+- ACTIVE — operational document, current and in use.
+- DEPRECATED — superseded; historical only, no authority.
+- REFERENCE — supporting material; not subject to pipeline.
 
 ---
 
-## Pending Documents
+## Document index
 
-### CLAUDE.md
+Notes state relationships and fetch timing only — how a document relates
+to others, when to read it. Never contents.
 
-- **Status:** NOT YET CREATED
-- **Purpose:** Project brief for Claude Code. Lives at repo root.
-  Engineering directives, tech stack, system specifications,
-  document access protocol.
-- **Trigger:** Design core is now fully locked (Phase 1 complete).
-  CLAUDE.md is written in Phase 2, after a loose diagnostic build
-  surfaces Claude Code's default behaviors to constrain.
+### decision-log.md — CANONICAL SOURCE
+https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/decision-log.md
+Permanent record of all decisions. Entries append to the bottom; newest
+is last. Verify the final entry against known state. Mixed status — read
+each entry per its own STATUS line.
 
-### reference/ directory
+### CLAUDE.md — ACTIVE
+https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/CLAUDE.md
+Build brief at repo root. Read by Claude Code at session start; authority
+for the build layer. Not a design document — design authority still flows
+from the locked docs. Its directives track build findings and change; do
+not mirror them here.
 
-- **Status:** NOT YET CREATED
-- **Purpose:** Supporting material. Not subject to pipeline
-  validation.
+### Guiding_Principles — LOCKED
+https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/Guiding_Principles
+Design authority layer. Sits above all system documents. Validate content
+against this before any other locked doc.
+
+### Run_Design — LOCKED
+https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/Run_Design
+Constrains all draft documents.
+
+### Class_System — LOCKED
+https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/Class_System
+Constrained by Run_Design and Guiding_Principles. Constrains City_Layer
+and World_Feedback.
+
+### City_Layer — LOCKED
+https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/City_Layer
+Constrained by Run_Design, Class_System, and Guiding_Principles.
+Reconciled with World_Feedback.
+
+### World_Feedback — LOCKED
+https://raw.githubusercontent.com/SnowBroScott/possibly-a-hero-canonical/refs/heads/main/locked/World_Feedback
+Constrained by Run_Design, Class_System, and Guiding_Principles.
+Reconciled with City_Layer.
+
+### DRAFT/ — empty
+No draft documents in refinement.
+
+### reference/ — NOT YET CREATED
+Supporting material. Not subject to pipeline validation.
 
 ---
 
-## Repo Structure
+## Repo structure
 
-/locked             — canonical, non-negotiable documents
-/DRAFT              — directionally committed documents in refinement (currently empty)
-/canonical-manifest — master index of all documents (this file)
+/CLAUDE.md          — build brief, read by Claude Code at session start
+/canonical-manifest — this routing table
 /decision-log.md    — permanent record of all decisions
+/locked             — canonical, non-negotiable documents
+/DRAFT              — draft documents in refinement (empty)
