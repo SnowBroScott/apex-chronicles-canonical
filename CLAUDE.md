@@ -190,7 +190,18 @@ decomposition before building.
 
 ---
 
-## 6. AT HANDOFF
+### Directive 6 — Inspect, don't infer.
+
+Read the actual graph, function, or property. Never predict engine behavior
+from a screenshot, a node's name, or memory of how Unreal "usually" works. In
+one session, three wrong calls came from inferring instead of opening the
+function; two cost build steps. When a target's recon or verification asks what
+something does, open it and read it — a screenshot shows a graph's shape, not
+its behavior.
+
+---
+
+## 7. AT HANDOFF
 
 Every build target ends the same way:
 
