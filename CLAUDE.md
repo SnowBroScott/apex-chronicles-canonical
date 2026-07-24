@@ -91,3 +91,114 @@ is non-negotiable and constrains everything you build.
 Fetch `Guiding_Principles` always — it constrains everything. Then fetch only the
 system document(s) the target actually touches. A combat target needs
 `Run_Design` and `Class_System`; it does not need `City_Layer`. Keep context lean
+
+---
+
+## 4. LOCK-BEFORE-BUILD
+
+You build only from locked design.
+
+If a build target requires design that is not in `/locked` — an enemy roster, a
+progression detail, a camera angle, a reward economy — **stop and report that the
+target is blocked on an unlocked dependency.** Name what is missing. Do not build
+it from a decision-log entry, do not infer it, do not pick a plausible number.
+
+The unlocked thing goes back through the design pipeline, gets locked, and
+returns as buildable. Design flows downstream into build; gaps found during a
+build flow back upstream — never patched in-session. A target that looks blocked
+is not a failure. It is the system working: it caught a design gap before it
+became engine scrap.
+
+---
+
+## 5. NON-NEGOTIABLE DIRECTIVES
+
+These come from verified build passes. The first two are design law, and they are
+restatements of `Run_Design` — not new rules.
+
+### Directive 1 — Enemies do not hunt. (Design law. Written with Directive 2.)
+
+No global aggro. No steering-toward-player-every-tick. Encounters are
+**stationary, chooseable nodes** — idle until the player approaches. The player
+chooses which fight to start and when. A diagnostic build gave every enemy
+swarm-aggro; that is the opposite of the model and must not recur.
+
+`Run_Design` locks the encounter model and the camera framing that makes
+stationary, readable encounters legible. A swarm erases the readability the
+camera model exists to provide.
+
+### Directive 2 — No auto-clear AOE. Combat is intentional. (Design law. Written with Directive 1.)
+
+`Run_Design` locks it directly: nothing procs automatically; nothing kills
+enemies the player was not involved in killing. A diagnostic build shipped a
+350-radius radial burst on a 0.4s cooldown that deleted everything in range —
+zero positioning, zero intent, hold-a-cooldown-to-win. That is the exact
+auto-proc model the design retired.
+
+Combat verbs are **skill-expressed tools**: aimed, timed, positioned, combined.
+
+**Directives 1 and 2 are linked.** The diagnostic built press-to-clear *because*
+it built a swarm — the swarm creates the problem, the radius-delete solves it,
+the player just holds a button. Fix them as a pair. Do not solve a self-created
+crowd problem with an auto-clear.
+
+### Directive 3 — Trust your own report in proportion to reuse-vs-invent.
+
+You are reliable on **reuse-heavy** tasks (mesh swaps, existing components,
+specified cameras). You are fragile and self-over-reporting on **novel
+authoring** — and you paper over the failure. In one pass you "verified" a new
+attack by bypassing a broken input binding and confirming downstream code,
+reporting success on a feature that did not work.
+
+- Prefer reuse of reliable existing systems over novel authoring where a target
+  allows it.
+- **Input specifically:** build toward existing/default input bindings.
+  Default-wired input worked; a newly-authored binding silently failed.
+- On the novel parts of any target, verify hardest, and report the verification
+  method honestly — what you actually confirmed, not what you assume follows.
+
+### Directive 4 — You cannot play-test. This is permanent.
+
+You have no input injection. You cannot press a key or click. **"Confirmed at
+runtime" from you means "the graph would do this if input arrived" — never "I
+played it."** Report it in exactly those terms. Never state or imply that
+something plays, feels, or works in-hand.
+
+**Graph validation does not confirm visual presence.** A build has already passed
+compile with 0 issues, 0 orphans, and 0 disconnected execs while its actor
+rendered nothing in the viewport. Node topology says nothing about whether a mesh
+is assigned, visible, or on screen. When a target has a visual deliverable, check
+the asset assignment and visibility properties explicitly and report them — and
+still call it property inspection, not play.
+
+Verification of feel is the designer's job, permanently and structurally. Every
+build target ends with a handoff for human play-verification.
+
+### Directive 5 — Build targets are small and single-purpose.
+
+One target, one verification, one commit. Decompose into the smallest provable
+units.
+
+Two independent reasons: (a) the agentic build loop is token-expensive — an
+open-ended brief burns hot and threatens session limits; the lever is **target
+size**. (b) You are most reliable on contained, reuse-heavy work (Directive 3),
+and small targets isolate failure — a novel-authoring whiff buried in a big build
+is invisible; as its own target it is obvious.
+
+If a brief arrives larger than a single provable unit, say so and propose the
+decomposition before building.
+
+---
+
+## 6. AT HANDOFF
+
+Every build target ends the same way:
+
+- State what was built, and what was reused vs. newly authored.
+- State the verification method in honest terms (graph and property inspection,
+  not play).
+- For visual deliverables, state the asset assignment and visibility properties
+  you actually checked.
+- Flag the novel parts explicitly as the ones most needing human play-check.
+- Hand off for play-verification. Nothing is trusted until the designer has
+  played it. A passing graph is not a shipped feature.
