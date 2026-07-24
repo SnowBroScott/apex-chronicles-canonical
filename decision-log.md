@@ -3773,3 +3773,125 @@ final implementation.
 REPLACES: Nothing — new build finding.
 
 STATUS: NOTED
+
+---
+
+DECISION LOG ENTRY
+
+DECISION: The canonical manifest is a routing table, not a summary layer.
+Its per-document notes state relationships and fetch-timing only — never
+contents.
+
+DATE: July 24, 2026
+
+WHY: The manifest had rotted into a June-16 snapshot describing a July-23
+project — CLAUDE.md listed as "not yet created," Run_Design's note
+pre-dating the camera model promoted into its own §3. Root cause: the
+manifest was doing three jobs — routing table, design-summary, and
+project-state narrator — and only the first is its job. The design
+summaries were a second, unversioned copy of the locked docs: paid for on
+every agent's read, and guaranteed to drift from source the moment source
+changed, which is exactly what happened. A summary kept apart from its
+source always eventually lies. Stripping the manifest to pure routing made
+it both cheaper (dropped roughly five fat paragraphs off the most-read
+file in the repo) and durable (routing info changes only when a document
+is created, locked, or deprecated — rare). Rejected: refreshing the stale
+summaries in place. That treats the symptom and leaves the drift mechanism
+intact; the fix is deleting the summaries, not updating them. The document
+is the source — go read the document.
+
+REPLACES: Nothing — new decision. Corrects the prior undecided manifest
+form described above.
+
+STATUS: LOCKED
+
+
+DECISION LOG ENTRY
+
+DECISION: The decision log is a provenance archive — the why behind
+decisions, greped on demand. It is never read whole and never the
+session-open currency read. Current state is read from status.md and from
+/locked, not from the log.
+
+DATE: July 24, 2026
+
+WHY: The log is 94 entries and 38 of them supersede an earlier one — 40%
+supersession. That makes it structurally a transaction journal: current
+state is the net of all entries after applying every supersession, not the
+last entry. So reading the log tail as a currency check — as the old
+session-open ritual did — is mathematically broken: the tail is the most
+recent transaction, not the balance. The log's real value is durable,
+searchable provenance — why we decided X, what we rejected — a
+rarely-read, grep-by-keyword access pattern. A ~42k-token archive is only
+a token sink if something loads it whole; loaded selectively it is cheap
+and correct. Rejected: compacting or pruning the log to shrink it. That
+destroys provenance — the entire point of the document — to solve a token
+cost that is not paid under selective retrieval. The fix is not a smaller
+log; it is not reading the log for the wrong query. Currency moves to
+status.md.
+
+REPLACES: The informal convention of reading the decision-log tail as a
+session-open currency check.
+
+STATUS: LOCKED
+
+
+DECISION LOG ENTRY
+
+DECISION: status.md, at repo root, is the single session-open read for
+orientation. It holds current state — built, blocked, next — is
+overwritten every session (never appended; git holds history), and holds
+nothing permanent: it stages findings and decisions headed for permanent
+homes (/locked, decision-log.md, CLAUDE.md) and reflects state without
+ever setting it.
+
+DATE: July 24, 2026
+
+WHY: Session-open had three documents competing to be the orientation
+read — manifest, decision-log tail, and whatever dated state doc could be
+found — three fetches to answer one question: where are we, what am I doing
+today. That question has one right source, a current snapshot, so
+session-open collapses to a single clean read and the broken log-tail
+currency check is retired. Overwrite-not-append is load-bearing: an
+appended state doc is the decision log again with extra steps and would
+bloat back to thousands of lines within weeks; a rewritten one physically
+cannot accumulate. Modeled loosely on the Emberhold end-of-session
+status-doc pattern. Rejected: keeping the dated state-doc pile (may5,
+6-12, 07-23, and so on). That is append-forever at the file-tree level —
+the same disease one layer up. One overwritten file; git owns the history.
+
+REPLACES: The dated per-session state-doc practice, and (with the entry
+above) the decision-log-tail currency check at session open.
+
+STATUS: LOCKED
+
+
+DECISION LOG ENTRY
+
+DECISION: A durable finding is filed to the document whose reader is bound
+by it. Build doctrine (binds the builder) routes to CLAUDE.md directives;
+design and feel findings (bind the designer) route to decision-log.md or a
+locked document. The status doc's findings section is a staging tray with
+exactly those two exits and holds nothing permanent.
+
+DATE: July 24, 2026
+
+WHY: Findings that surface mid-build need a permanent home or they die on
+the next status.md overwrite. The routing test is "who has to obey this
+finding?" — file it to that reader. Build-doctrine findings
+(rig-never-promotes, yaw-on-the-spring-arm, read-the-graph-don't-infer)
+bind Claude Code and belong in the file it loads whole each session.
+Design and feel findings (for example, pitch spends world-budget) bind the
+designer at taste-time and belong in the log or a locked document. The
+test also keeps CLAUDE.md from becoming the next bloat center: not every
+finding is build doctrine, and dumping all of them into CLAUDE.md rebuilds
+the accumulation problem we just dismantled. Consequence flagged: CLAUDE.md
+is loaded whole by Claude Code every session, so a superseded directive
+must be removed, not appended-and-marked-dead — a dead directive still
+costs tokens on every load. Rejected: a single undifferentiated findings
+document. It ignores who is bound and forces every reader to load findings
+irrelevant to them.
+
+REPLACES: Nothing — new doctrine.
+
+STATUS: LOCKED
