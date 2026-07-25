@@ -3895,3 +3895,202 @@ irrelevant to them.
 REPLACES: Nothing — new doctrine.
 
 STATUS: LOCKED
+
+---
+
+DECISION LOG ENTRY
+
+DECISION: The rig's live camera values are set from the `Provisional*`
+variables via the Construction Script, not from the component defaults
+visible in the Details panel.
+
+DATE: July 24, 2026
+
+WHY: status.md described the Provisional variables as scaffolding "nothing
+reads," and recorded arm 800 / pitch -40 as `CameraBoom` component
+properties. Both wrong. The Construction Script SETs Target Arm Length from
+`Provisional Arm Length` (default 800) and pitch from
+`Provisional Camera Pitch` (default -40); Event Tick then re-asserts pitch
+with a hardcoded -40.0 literal every frame. The Details panel read -90 and
+1500 for the entire session and neither value was ever live. Consequence
+for every future tune: arm length and pitch are changed by editing the
+Provisional variables and recompiling. Editing the Details panel does
+nothing. Pitch is set in two independent places that currently agree by
+coincidence — that is tolerable in a scratch rig and must not be inherited
+by the real pawn. Rejected: treating the Details panel as authoritative,
+which burned roughly forty minutes this session and produced one false
+finding (that arm 1500 had been the value validated at -40).
+
+REPLACES: The `BP_TestBedPawn` camera description in status.md — both the
+claim that the values live on the component and the claim that the
+Provisional variables are dead.
+
+STATUS: LOCKED
+
+---
+
+DECISION LOG ENTRY
+
+DECISION: Pitch -40 with arm length 800 survives contact with geometry.
+Both values hold.
+
+DATE: July 24, 2026
+
+WHY: The occlusion-check target placed four engine cubes on the testbed — a
+700uu low block, a 2000uu tall block, and two 1000uu blocks forming a 600uu
+corridor — and the floor was walked. Across every frame captured, including
+pressed into an interior corner, alongside the tall block, and inside the
+corridor, the character stayed fully legible. Designer read: contained
+without being claustrophobic, with room around the character for city
+detail. The brief's five questions came back clean — the tall block does
+not swallow the character, two storeys do not occlude, the corridor gives a
+usable view under rotation, and the horizon holds. This is the validation
+the empty plane could never provide.
+
+REPLACES: The OPEN/UNVALIDATED item "pitch -40 validated in an empty room —
+untested, no geometry on the plane." Also the companion item on arm 800 not
+having been re-tuned since pitch moved 25°: 800 was live throughout and has
+now been walked against geometry at -40.
+
+STATUS: LOCKED
+
+---
+
+DECISION LOG ENTRY
+
+DECISION: The camera's failure mode at -40 / 800 is the boom entering
+geometry, not geometry occluding the character.
+
+DATE: July 24, 2026
+
+WHY: At pitch -40 and arm 800 the boom sits roughly 613uu horizontally
+behind the character and roughly 514uu above it. The low test block is
+700uu — a two-storey building is already taller than the camera. Walls
+therefore do not pass between the camera and the character; they pass
+through the camera. The target was written to hunt occlusion and found the
+opposite problem. `bDoCollisionTest` is false on the spring arm, which is
+the correct setting for this test and means what was observed is the worst
+case, not Unreal's default behaviour. Rejected: reading the clean occlusion
+result as "no camera problem." The problem is real. It is a different
+problem than the one predicted.
+
+REPLACES: Nothing — new finding.
+
+STATUS: LOCKED
+
+---
+
+DECISION LOG ENTRY
+
+DECISION: The see-through-the-building effect observed in the testbed is an
+artifact of scratch geometry and is not treated as a design problem.
+
+DATE: July 24, 2026
+
+WHY: When the boom entered a test block, the block stopped drawing and its
+interior contents became visible, including an encounter node standing
+inside it. Initially flagged as game-breaking on the grounds that it would
+reveal enemies behind buildings and undercut deliberate approach. Declined
+on geometry: the boom is roughly 613uu long and the test blocks are 500-800uu
+deep — thin enough for the camera to pass entirely through the volume. A
+real city building is thousands of units deep, so the camera never clears
+the near wall and the far side of the block is never inside the
+camera-to-character wedge. The effect does not survive real buildings. The
+cause of the disappearance is backface culling on single-sided engine
+primitives, not any occlusion system — none is implemented in the rig.
+
+REPLACES: Nothing — new decision.
+
+STATUS: DECLINED
+
+---
+
+DECISION LOG ENTRY
+
+DECISION: Solving camera occlusion through city layout alone — street width
+and block spacing sized so the boom never enters a wall — is declined.
+
+DATE: July 24, 2026
+
+WHY: Yaw is free and mouse-driven, so the player can put any wall behind
+the camera at will. The constraint is therefore a clearance bubble around
+the character in every direction, not a corridor width in one. At roughly
+613uu of horizontal boom that implies streets north of 1200uu before the
+character or any street content is accounted for, which is a plaza, not a
+city. Interior corners defeat it outright: two converging walls give a
+diagonal shorter than either approach, and no street width helps. Combat
+defeats it twice over, because position in a fight is chosen by the
+enemies. Being backed into a corner is the intended experience, and a
+camera that only works while the player voluntarily stays in the open fails
+exactly when the game is at its best. Note the coupling this exposes: Hades
+gets away with authored occluders because its camera has no free yaw. Free
+yaw was taken July 23 because the camera is the aiming reference for
+directional powers. Free yaw is what converts occlusion from a layout
+problem into a runtime one. Both decisions stand; the cost now has a name.
+Layout still governs framing and legibility — it is no longer the mechanism
+for occlusion.
+
+REPLACES: Partially amends the "city built to the camera" scope commitment.
+Layout is no longer expected to carry occlusion on its own.
+
+STATUS: DECLINED
+
+---
+
+DECISION LOG ENTRY
+
+DECISION: Direction for camera occlusion — geometry intersecting the
+camera-to-character wedge renders translucent. The wall stays present, it
+does not disappear, and the camera does not move.
+
+DATE: July 24, 2026
+
+WHY: Chosen over three alternatives, each declined for a specific reason.
+Camera pull-in on wall collision: declined by the designer, because
+anything closer than arm 800 at -40 reads claustrophobic, which is what
+drove pitch off -65 in the first place. Making the occluder disappear:
+declined, it removes the building. A localized mask around the character:
+declined because it ghosts a disc around the body and leaves anything a few
+metres away hidden — and the volume a wall hides is the player's own
+immediate pocket, which is precisely the volume that must stay readable in
+a fight. Whole-wall translucency reveals that pocket, including whatever is
+in it with the player, and the wedge-intersection selection rule bounds the
+exposure to it — all other geometry stays solid. It is also indifferent to
+the geometric relationship, handling wall-between-camera-and-character,
+camera-fully-inside-a-volume, and interior corners identically. Layout
+could never do that. Wireframe overlay to indicate continued presence is
+held, not adopted: it reads tactical-HUD, which is a tone statement worth
+making deliberately rather than inheriting from convention. Open and
+unsettled: whether several stacked translucent faces read as legible or as
+soup, and how hard the fade should be. Those are floor questions and need a
+real material.
+
+REPLACES: Nothing — new direction.
+
+STATUS: DRAFT
+
+---
+
+DECISION LOG ENTRY
+
+DECISION: Treat CLAUDE.md as not reaching Claude Code until proven
+otherwise. Verify before the next build target runs.
+
+DATE: July 24, 2026
+
+WHY: Second independent symptom. Executing the occlusion target, Claude
+Code searched the filesystem, MCP resources, registered Agent Skills and
+DesignSync for `locked/Guiding_Principles` and `locked/Run_Design`,
+reported them unreachable through every channel available to it, and never
+attempted a curl against the canonical repo — which is exactly what
+CLAUDE.md §3 specifies. Last session it treated Directive 1 as absent while
+looking in the locked docs rather than CLAUDE.md §5. Both are consistent
+with the file not being loaded at session start. Splitting the claims:
+"Claude Code did not fetch canon through the specified channel" is
+observed. "CLAUDE.md is not being loaded" is inference. The test is cheap —
+ask it to state Directive 4 back before anything else, and do it before
+briefing work rather than after.
+
+REPLACES: Nothing — sharpens the existing OPEN item.
+
+STATUS: NOTED
